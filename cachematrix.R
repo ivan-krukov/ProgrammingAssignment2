@@ -21,8 +21,10 @@
 
 ## Create a new cache matrix object
 makeCacheMatrix <- function(x = matrix()) {
-  self.inverse <- NULL
+  # Note that I am prepending all the local variables with `self.` to avoid confusion.
+  # This only syntactically emulates the object, no actual `self` instance exists.
   
+  self.inverse <- NULL
   self.set <- function(y) {
     if (is.matrix(y)) {
       x <<- y
