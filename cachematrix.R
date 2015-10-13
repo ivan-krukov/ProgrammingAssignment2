@@ -24,7 +24,10 @@ makeCacheMatrix <- function(x = matrix()) {
   # Note that I am prepending all the local variables with `self.` to avoid confusion.
   # This only syntactically emulates the object, no actual `self` instance exists.
   
+  # The re-entrant state variable, actually caching the inverse
   self.inverse <- NULL
+  
+  # Set the underlying matrix data, checking that the data provide is a matrix
   self.set <- function(y) {
     if (is.matrix(y)) {
       x <<- y
@@ -33,11 +36,19 @@ makeCacheMatrix <- function(x = matrix()) {
       stop("makeCacheMatrix$set: The provided object is not a matrix")
     }
   }
+  
+  # Get the underlying data
   self.get <- function() x
+  
+  # Set inverse of the object's matrix
   self.setInverse <- function(inverse) {
     self.inverse <<- inverse
   }
+  
+  # Get the cached inverse
   self.getInverse <- function() self.inverse
+  
+  # Return a method list
   return(list(
     set = self.set,
     get = self.get,
@@ -49,14 +60,16 @@ makeCacheMatrix <- function(x = matrix()) {
 
 ## Calculate the inverse of the matrix object created with `makeCacheMatrix()`, store the result.
 cacheSolve <- function(x, ...) {
-  ## Return a matrix that is the inverse of 'x'
+  # Try getting the inverse of the object's matrix
   self.inverse <- x$getInverse()
   if (!is.null(self.inverse)) {
-    message("getting cached inverse")
-    return(self.inverse)
+    # If it was calculated, return the cached version
+    message("cacheSolve: using cached inverse")
+  } else {
+    # Otherwise, calculate the inverse and save it
+    self.data <- x$get()
+    self.inverse <- solve(self.data, ...)
+    x$setInverse(self.inverse)
   }
-  self.data <- x$get()
-  self.inverse <- solve(self.data, ...)
-  x$setInverse(self.inverse)
   return(self.inverse)
 }
