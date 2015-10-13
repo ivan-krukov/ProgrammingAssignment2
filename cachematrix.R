@@ -60,15 +60,25 @@ makeCacheMatrix <- function(x = matrix()) {
 
 ## Calculate the inverse of the matrix object created with `makeCacheMatrix()`, store the result.
 cacheSolve <- function(x, ...) {
+  
   # Try getting the inverse of the object's matrix
   self.inverse <- x$getInverse()
+  
+  # If it was calculated, return the cached version
   if (!is.null(self.inverse)) {
-    # If it was calculated, return the cached version
     message("cacheSolve: using cached inverse")
-  } else {
-    # Otherwise, calculate the inverse and save it
+  }
+  
+  # Otherwise, calculate the inverse and save it
+  else {
+    
+    # Get the object's matrix
     self.data <- x$get()
+    
+    # Calculate the inverse, propagating all the parameters with `...`
     self.inverse <- solve(self.data, ...)
+    
+    # Cache the inverse
     x$setInverse(self.inverse)
   }
   return(self.inverse)
